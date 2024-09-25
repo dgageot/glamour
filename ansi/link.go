@@ -30,7 +30,8 @@ func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
 
 			el := &BaseElement{
 				Token:  link,
-				Prefix: "",
+				Prefix: " ",
+				Suffix: " ",
 				Style:  ctx.options.Styles.Link,
 			}
 
