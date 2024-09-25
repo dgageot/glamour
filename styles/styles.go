@@ -9,7 +9,7 @@ import (
 const (
 	defaultListIndent      = 2
 	defaultListLevelIndent = 4
-	defaultMargin          = 2
+	defaultMargin          = 1
 )
 
 // Default styles.
@@ -155,11 +155,9 @@ var (
 		},
 		H1: ansi.StyleBlock{
 			StylePrimitive: ansi.StylePrimitive{
-				Prefix:          " ",
-				Suffix:          " ",
-				Color:           stringPtr("228"),
-				BackgroundColor: stringPtr("63"),
-				Bold:            boolPtr(true),
+				Prefix: "",
+				Suffix: "",
+				Bold:   boolPtr(true),
 			},
 		},
 		H2: ansi.StyleBlock{
