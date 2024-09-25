@@ -14,29 +14,52 @@ type LinkElement struct {
 }
 
 func (e *LinkElement) Render(w io.Writer, ctx RenderContext) error {
-	for _, child := range e.Children {
-		if r, ok := child.(StyleOverriderElementRenderer); ok {
-			st := ctx.options.Styles.LinkText
-			if err := r.StyleOverrideRender(w, ctx, st); err != nil {
-				return err
-			}
-		} else {
+	u, err := url.Parse(e.URL)
+	if err == nil && "#"+u.Fragment != e.URL {
+		for _, child := range e.Children {
+			// Description
 			var b bytes.Buffer
-			if err := child.Render(&b, ctx); err != nil {
+			if err := child.Render(&b, NewRenderContext(Options{})); err != nil {
 				return err
 			}
+			description := b.String()
+
+			// Show url
+			token := resolveRelativeURL(e.BaseURL, e.URL)
+			link := "\x1b]8;;" + token + "\x07" + description + "\x1b]8;;\x07" + "\u001b[0m"
+
 			el := &BaseElement{
-				Token: b.String(),
-				Style: ctx.options.Styles.LinkText,
+				Token:  link,
+				Prefix: "",
+				Style:  ctx.options.Styles.Link,
 			}
+
 			if err := el.Render(w, ctx); err != nil {
 				return err
 			}
 		}
-	}
-
-	u, err := url.Parse(e.URL)
-	if err == nil && "#"+u.Fragment != e.URL { // if the URL only consists of an anchor, ignore it
+		// if the URL only consists of an anchor, ignore it
+	} else {
+		for _, child := range e.Children {
+			if r, ok := child.(StyleOverriderElementRenderer); ok {
+				st := ctx.options.Styles.LinkText
+				if err := r.StyleOverrideRender(w, ctx, st); err != nil {
+					return err
+				}
+			} else {
+				var b bytes.Buffer
+				if err := child.Render(&b, ctx); err != nil {
+					return err
+				}
+				el := &BaseElement{
+					Token: b.String(),
+					Style: ctx.options.Styles.LinkText,
+				}
+				if err := el.Render(w, ctx); err != nil {
+					return err
+				}
+			}
+		}
 		el := &BaseElement{
 			Token:  resolveRelativeURL(e.BaseURL, e.URL),
 			Prefix: " ",
