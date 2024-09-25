@@ -89,6 +89,7 @@ func NewTermRenderer(options ...TermRendererOption) (*TermRenderer, error) {
 		renderer.NewRenderer(
 			renderer.WithNodeRenderers(
 				util.Prioritized(ar, highPriority),
+				util.Prioritized(NewHyperlinkRenderer(), highPriority-1),
 			),
 		),
 	)
